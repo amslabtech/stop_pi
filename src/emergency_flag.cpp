@@ -10,8 +10,12 @@
 using namespace std;
 
 ros::Publisher control_mode_pub;
+ros::Publisher emergency_pub;
 
-int PIN = 13;
+// use BCM number
+//int PIN = 13;
+int PIN = 21;
+//int PIN = 29;
 
 ypspur_ros::ControlMode control_mode;
 
@@ -21,6 +25,7 @@ int main(int argc, char** argv){
 	ros::NodeHandle n;
 
 	control_mode_pub = n.advertise<ypspur_ros::ControlMode>("/t_frog/control_mode", 1);
+	emergency_pub = n.advertise<std_msgs::Bool>("/emergency_stop", 1);
 
 	control_mode.vehicle_control_mode = ypspur_ros::ControlMode::VELOCITY;
 
@@ -36,17 +41,21 @@ int main(int argc, char** argv){
 	pinMode(PIN, INPUT);
 	
 	while(ros::ok()){
+		std_msgs::Bool emergency_stop;
 
 		if(digitalRead(PIN) == 0){
 			control_mode.vehicle_control_mode = ypspur_ros::ControlMode::OPEN;
+			emergency_stop.data = true;
 			cout << "robot stop" << endl;
 		}
 
 		else{
 			control_mode.vehicle_control_mode = ypspur_ros::ControlMode::VELOCITY;
+			emergency_stop.data = false;
 			cout << "move" << endl;
 		}
 			control_mode_pub.publish(control_mode);
+			emergency_pub.publish(emergency_stop);
 
 		loop_rate.sleep();
 	}
