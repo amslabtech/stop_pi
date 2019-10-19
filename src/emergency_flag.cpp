@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <std_msgs/Bool.h>
 
+#include <cstdlib>
+#include <string>
+
 #include <ypspur_ros/ControlMode.h>
 
 using namespace std;
@@ -21,6 +24,10 @@ ypspur_ros::ControlMode control_mode;
 
 int main(int argc, char** argv){
 	
+	std::string gpio_command = "gpio export " + std::to_string(PIN) + " in";
+	std::cout << gpio_command << std::endl;
+	std::system(gpio_command.c_str());
+
 	ros::init(argc, argv, "emergency_flag");
 	ros::NodeHandle n;
 
